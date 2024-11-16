@@ -111,6 +111,34 @@ app.get('/physiotherapists', (req, res) => __awaiter(void 0, void 0, void 0, fun
         res.status(500).send({ error: `Error fetching physiotherapists ${error}` });
     }
 }));
+// @ts-ignore
+app.get('/appointments', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const location = req.query.location;
+    if (!location) {
+        return res.status(400).send({ error: 'Location query parameter is required.' });
+    }
+    try {
+        // Determine which database to use based on location
+        const database = location.toLowerCase();
+        if (!dbURIs[database]) {
+            return res.status(400).send({ error: `Invalid location: ${location}` });
+        }
+        yield connectToDB(database);
+        // Do not send back unique object id
+        const projection = {
+            '_id': 0,
+            '__v': 0,
+        };
+        const appointments = yield schema_1.appointment_col.find({}, projection).exec();
+        res.json(appointments);
+    }
+    catch (error) {
+        res.status(500).send({ error: `Error fetching physiotherapists ${error}` });
+    }
+}));
+// app.get('/programs', async (req: Request, res: Response) => {
+//
+// });
 // Run the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
