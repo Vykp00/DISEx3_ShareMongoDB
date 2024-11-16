@@ -25,7 +25,7 @@ const App = () => {
 
     return (
         <div style={{ padding: "20px" }}>
-            <h1>Patient Management System</h1>
+            <h1>iTerveys Dashboard</h1>
 
             {/* Dropdown to select endpoint */}
             <label>
