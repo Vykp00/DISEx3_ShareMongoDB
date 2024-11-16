@@ -36,6 +36,7 @@ interface AppointmentObject {
 }
 
 interface ProgramObject {
+    _id?: mongoose.Types.ObjectId;
     program_name: string;
     category: string;
     description: string;
@@ -174,44 +175,6 @@ const k_appointments: AppointmentObject[] = [
     }
 ]
 
-const k_programs: ProgramObject[] = [
-    {
-        "program_name": "Knee Rehabilitation",
-        "category": "Rehabilitation",
-        "description": "Exercises to improve knee mobility and strength.",
-        "repetitions": 3,
-        "exercises": ["Squats", "Lunges", "Leg Press"]
-    },
-    {
-        "program_name": "Shoulder Recovery",
-        "category": "Orthopedic",
-        "description": "Therapy for regaining shoulder movement.",
-        "repetitions": 2,
-        "exercises": ["Shoulder Rolls", "Pendulum Swings", "Arm Raises"]
-    },
-    {
-        "program_name": "Post-Surgery Therapy",
-        "category": "Rehabilitation",
-        "description": "Customized plan for surgery recovery.",
-        "repetitions": 4,
-        "exercises": ["Stretching", "Walking", "Balance Training"]
-    },
-    {
-        "program_name": "Mobility Restoration",
-        "category": "Neurological",
-        "description": "Sessions to enhance coordination and movement.",
-        "repetitions": 5,
-        "exercises": ["Step Training", "Balance Board", "Core Strength"]
-    },
-    {
-        "program_name": "General Therapy",
-        "category": "Pediatrics",
-        "description": "Basic exercises for improving body alignment.",
-        "repetitions": 3,
-        "exercises": ["Basic Yoga", "Jumping Jacks", "Skipping"]
-    }
-]
-
 /*
 =========================================================
                         MUNICH
@@ -342,45 +305,6 @@ const m_appointments: AppointmentObject[] = [
     }
 ]
 
-const m_programs: ProgramObject[] = [
-    {
-        "program_name": "Marathon Recovery",
-        "category": "Sports",
-        "description": "Post-run recovery exercises.",
-        "repetitions": 3,
-        "exercises": ["Foam Rolling", "Leg Stretches", "Ankle Rotations"]
-    },
-    {
-        "program_name": "Lower Back Pain Relief",
-        "category": "Orthopedic",
-        "description": "Plan to reduce and prevent lower back pain.",
-        "repetitions": 4,
-        "exercises": ["Cat-Cow Stretch", "Bridge Pose", "Plank"]
-    },
-    {
-        "program_name": "Surgery Rehabilitation",
-        "category": "Rehabilitation",
-        "description": "Exercises to aid in recovery after surgery.",
-        "repetitions": 5,
-        "exercises": ["Walking", "Resistance Band Exercises", "Wall Push-ups"]
-    },
-    {
-        "program_name": "Hip Mobility Restoration",
-        "category": "Neurological",
-        "description": "Therapy to restore hip mobility.",
-        "repetitions": 3,
-        "exercises": ["Hip Flexor Stretch", "Side Leg Lifts", "Step Ups"]
-    },
-    {
-        "program_name": "Child Therapy Basics",
-        "category": "Pediatrics",
-        "description": "General exercises for children with movement issues.",
-        "repetitions": 2,
-        "exercises": ["Obstacle Course", "Jumping in Place", "Skipping Rope"]
-    }
-]
-
-
 /*
 =========================================================
                         LONDON
@@ -510,43 +434,50 @@ const l_appointments: AppointmentObject[] = [
     }
 ]
 
-const l_programs: ProgramObject[] = [
-    {
-        "program_name": "Shoulder Strengthening",
-        "category": "Orthopedic",
-        "description": "Exercises for improving shoulder stability.",
-        "repetitions": 4,
-        "exercises": ["Arm Circles", "Wall Slides", "Resistance Band Pulls"]
-    },
-    {
-        "program_name": "Post-Accident Recovery",
+
+// Program data is replicated across databases
+const rep_programs: ProgramObject[] = [
+    {   "_id": new mongoose.Types.ObjectId('67389a22afac655db35cd05b'),
+        "program_name": "Knee Rehabilitation",
         "category": "Rehabilitation",
-        "description": "Plan to regain full mobility after an accident.",
-        "repetitions": 5,
-        "exercises": ["Step-ups", "Walking", "Resistance Band Stretches"]
-    },
-    {
-        "program_name": "Knee Stabilization",
-        "category": "Sports",
-        "description": "Therapy to prevent knee injuries.",
+        "description": "Exercises to improve knee mobility and strength.",
         "repetitions": 3,
-        "exercises": ["Squats", "Lunges", "Leg Raises"]
+        "exercises": ["Squats", "Lunges", "Leg Press"]
     },
     {
-        "program_name": "Migraine Relief Therapy",
-        "category": "Neurological",
-        "description": "Exercises to reduce migraine frequency.",
+        "_id": new mongoose.Types.ObjectId('67389a22afac655db35cd05c'),
+        "program_name": "Shoulder Recovery",
+        "category": "Orthopedic",
+        "description": "Therapy for regaining shoulder movement.",
         "repetitions": 2,
-        "exercises": ["Neck Stretches", "Breathing Exercises", "Head Tilts"]
+        "exercises": ["Shoulder Rolls", "Pendulum Swings", "Arm Raises"]
     },
     {
-        "program_name": "Pediatric Mobility Basics",
+        "_id": new mongoose.Types.ObjectId('67389a22afac655db35cd05d'),
+        "program_name": "Post-Surgery Therapy",
+        "category": "Rehabilitation",
+        "description": "Customized plan for surgery recovery.",
+        "repetitions": 4,
+        "exercises": ["Stretching", "Walking", "Balance Training"]
+    },
+    {
+        "_id": new mongoose.Types.ObjectId('67389a22afac655db35cd05e'),
+        "program_name": "Mobility Restoration",
+        "category": "Neurological",
+        "description": "Sessions to enhance coordination and movement.",
+        "repetitions": 5,
+        "exercises": ["Step Training", "Balance Board", "Core Strength"]
+    },
+    {
+        "_id": new mongoose.Types.ObjectId('67389a22afac655db35cd05f'),
+        "program_name": "General Therapy",
         "category": "Pediatrics",
-        "description": "Therapy plan for improving children's mobility.",
+        "description": "Basic exercises for improving body alignment.",
         "repetitions": 3,
-        "exercises": ["Crawling", "Jumping Jacks", "Obstacle Course"]
+        "exercises": ["Basic Yoga", "Jumping Jacks", "Skipping"]
     }
 ]
+
 
 // Occupy database
 async function seedDatabase(uri: string | undefined, database: string,
@@ -566,6 +497,9 @@ async function seedDatabase(uri: string | undefined, database: string,
 
             // Clear existing collections
             await physiotherapist_col.deleteMany({});
+            await program_col.deleteMany({});
+            await patient_col.deleteMany({});
+            await appointment_col.deleteMany({});
 
             // Insert physiotherapists and programs
             const insertedPhysiotherapists = await physiotherapist_col.insertMany(physio_data);
@@ -605,6 +539,6 @@ async function seedDatabase(uri: string | undefined, database: string,
 }
 
 // Run the seeding function
-// seedDatabase(k_uri, 'karjaani', k_physiotherapists, k_programs, k_patients, k_appointments);
-// seedDatabase(m_uri, 'munich', m_physiotherapists, m_programs, m_patients, m_appointments);
-// seedDatabase(l_uri, 'london', l_physiotherapist, l_programs, l_patients, l_appointments);
+// seedDatabase(k_uri, 'karjaani', k_physiotherapists, rep_programs, k_patients, k_appointments);
+// seedDatabase(m_uri, 'munich', m_physiotherapists, rep_programs, m_patients, m_appointments);
+// seedDatabase(l_uri, 'london', l_physiotherapist, rep_programs, l_patients, l_appointments);
