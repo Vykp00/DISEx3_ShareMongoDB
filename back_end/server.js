@@ -32,7 +32,15 @@ function connectToDB(database) {
             if (!dbURIs[database] || dbURIs[database].trim() === '') {
                 throw new Error(`Unknown database: ${database}`);
             }
+            // @ts-ignore
+            const currentDBName = mongoose_1.default.connection.name;
+            console.log(`Currently connected to MongoDB: ${currentDBName}`);
+            if (mongoose_1.default.connection.readyState === 1 && currentDBName == database) {
+                // Already connected to the same database
+                return;
+            }
             yield mongoose_1.default.disconnect(); // Disconnect from any existing connection
+            console.log(`Disconnected from ${currentDBName} databases`);
             // @ts-ignore
             yield mongoose_1.default.connect(dbURIs[database], { dbName: database });
             console.log(`Connected to ${database} database!`);

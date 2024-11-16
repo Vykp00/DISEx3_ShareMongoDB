@@ -21,7 +21,15 @@ async function connectToDB(database: string) {
         if (!dbURIs[database] || dbURIs[database].trim() === '') {
             throw new Error(`Unknown database: ${database}`);
         }
+        // @ts-ignore
+        const currentDBName : string = mongoose.connection.name
+        console.log(`Currently connected to MongoDB: ${currentDBName}`);
+        if (mongoose.connection.readyState === 1 &&  currentDBName == database) {
+            // Already connected to the same database
+            return;
+        }
         await mongoose.disconnect(); // Disconnect from any existing connection
+        console.log(`Disconnected from ${currentDBName} databases`);
         // @ts-ignore
         await mongoose.connect(dbURIs[database], {dbName: database});
         console.log(`Connected to ${database} database!`);
