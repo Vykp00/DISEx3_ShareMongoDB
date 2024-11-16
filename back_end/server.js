@@ -37,16 +37,18 @@ function connectToDB(database) {
             console.log(`Currently connected to MongoDB: ${currentDBName}`);
             if (mongoose_1.default.connection.readyState === 1 && currentDBName == database) {
                 // Already connected to the same database
-                return;
+                return currentDBName;
             }
             yield mongoose_1.default.disconnect(); // Disconnect from any existing connection
             console.log(`Disconnected from ${currentDBName} databases`);
             // @ts-ignore
             yield mongoose_1.default.connect(dbURIs[database], { dbName: database });
             console.log(`Connected to ${database} database!`);
+            return currentDBName;
         }
         catch (error) {
             console.error(`Error connecting to ${database} database:`, error);
+            return null;
         }
     });
 }
@@ -136,9 +138,39 @@ app.get('/appointments', (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(500).send({ error: `Error fetching physiotherapists ${error}` });
     }
 }));
-// app.get('/programs', async (req: Request, res: Response) => {
-//
-// });
+// @ts-ignore
+app.get('/programs', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Because program collection is replicated across db so we can connect to any db
+    // At this moment, we used a priority order,
+    // In production, we use a traffic monitoring tool to find the least busy database to connect
+    const dbOrder = ['karjaani', 'london', 'munich'];
+    let connectedDB = null;
+    // Attempt to connect to each database in order of the least traffic
+    for (const dbName of dbOrder) {
+        connectedDB = yield connectToDB(dbName);
+        if (connectedDB) {
+            console.log(`Successfully connected to database: ${connectedDB}`);
+            break;
+        }
+    }
+    // if all database failed, then return error
+    if (!connectedDB) {
+        return res.status(500).send({ error: 'Internal Server Error. Failed to connect to any database.' });
+    }
+    try {
+        // now fetch program
+        // Do not send back unique object id
+        const projection = {
+            '_id': 0,
+            '__v': 0,
+        };
+        const programs = yield schema_1.program_col.find({}, projection).exec();
+        res.json(programs);
+    }
+    catch (error) {
+        res.status(500).send({ error: `Error fetching programs ${error}` });
+    }
+}));
 // Run the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
