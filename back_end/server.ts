@@ -2,10 +2,19 @@
 import express, {Request, Response, NextFunction} from 'express';
 import mongoose, {Schema, Document, Model} from 'mongoose';
 import {physiotherapist_col, patient_col, appointment_col, program_col, IPatient} from "./schema";
+import cors from 'cors';
 
 const app = express();
 const PORT = 3000
 
+const corsOptions = {
+    origin: "http://localhost:5173", // Frontend URL
+    methods: ["GET", "POST"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type"],
+};
+
+// Enable CORS
+app.use(cors(corsOptions));
 
 // MongoDB connection URIs for each database in the Atlas cluster
 const dbURIs: Record<string, string> = {

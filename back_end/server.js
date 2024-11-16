@@ -16,8 +16,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const schema_1 = require("./schema");
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const PORT = 3000;
+const corsOptions = {
+    origin: "http://localhost:5173", // Frontend URL
+    methods: ["GET", "POST"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type"],
+};
+// Enable CORS
+app.use((0, cors_1.default)(corsOptions));
 // MongoDB connection URIs for each database in the Atlas cluster
 const dbURIs = {
     karjaani: process.env.NODE_KARJAANI_MONGO_URI || '',
