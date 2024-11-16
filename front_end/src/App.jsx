@@ -38,15 +38,18 @@ const App = () => {
                 </select>
             </label>
 
-            {/* Input for location */}
-            {endpoint !== "appointments" && endpoint !== "programs" && (
+            {/* Dropdown for location selection */}
+            {endpoint !== "programs" && (
                 <div style={{ marginTop: "10px" }}>
                     <label>
-                        Enter Location:
-                        <select value={location} onChange={(e) => setLocation(e.target.value)}>
-                            <option value="karjaani">Northern Europe</option>
-                            <option value="munich">Central Europe</option>
-                            <option value="london">Western Europe</option>
+                        Select Location:
+                        <select
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                        >
+                            <option value="karjaani">Karjaani</option>
+                            <option value="london">London</option>
+                            <option value="munich">Munich</option>
                         </select>
                     </label>
                 </div>
