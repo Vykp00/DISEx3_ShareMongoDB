@@ -1,0 +1,568 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+/*  Seed  script that sets up the four collections with sample data in TypeScript */
+const mongoose_1 = __importDefault(require("mongoose"));
+const schema_1 = require("./schema");
+// MongoDB connection URI
+const uri = process.env.NODE_MONGO_URI;
+const k_uri = process.env.NODE_KARJAANI_MONGO_URI;
+const m_uri = process.env.NODE_MUNICH_MONGO_URI;
+const l_uri = process.env.NODE_LONDON_MONGO_URI;
+// Dummy Data
+/*
+=========================================================
+                        KARJAANI
+=========================================================
+*/
+const k_physiotherapists = [
+    {
+        "name": "Emma Berg",
+        "email": "emma.berg@example.se",
+        "location": "Stockholm, Sweden",
+        "timezone": "Europe/Stockholm",
+        "specialization": "Sports Rehabilitation",
+    },
+    {
+        "name": "Hans Olofsson",
+        "email": "hans.olofsson@example.se",
+        "location": "Gothenburg, Sweden",
+        "timezone": "Europe/Stockholm",
+        "specialization": "Orthopedic Therapy",
+    },
+    {
+        "name": "Sanna Nielsen",
+        "email": "sanna.nielsen@example.fi",
+        "location": "Helsinki, Finland",
+        "timezone": "Europe/Helsinki",
+        "specialization": "Post-Surgery Recovery",
+    },
+    {
+        "name": "Kari Järvinen",
+        "email": "kari.jarvinen@example.fi",
+        "location": "Tampere, Finland",
+        "timezone": "Europe/Helsinki",
+        "specialization": "Chronic Pain Management",
+    },
+    {
+        "name": "Elias Andersson",
+        "email": "elias.andersson@example.se",
+        "location": "Malmo, Sweden",
+        "timezone": "Europe/Stockholm",
+        "specialization": "Geriatric Therapy",
+    }
+];
+// Occupy physiotherapist and program_id in script
+const k_patients = [
+    {
+        "name": "Lars Eriksson",
+        "birth_date": "1990-05-15",
+        "email": "lars.eriksson@example.se",
+        "location": "Stockholm, Sweden",
+        "timezone": "Europe/Stockholm",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Karin Svensson",
+        "birth_date": "1985-09-21",
+        "email": "karin.svensson@example.se",
+        "location": "Stockholm, Sweden",
+        "timezone": "Europe/Stockholm",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Markku Laine",
+        "birth_date": "1982-03-12",
+        "email": "markku.laine@example.fi",
+        "location": "Helsinki, Finland",
+        "timezone": "Europe/Helsinki",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Sofia Virtanen",
+        "birth_date": "1995-06-07",
+        "email": "sofia.virtanen@example.fi",
+        "location": "Tampere, Finland",
+        "timezone": "Europe/Helsinki",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Erik Johansson",
+        "birth_date": "1988-04-22",
+        "email": "erik.johansson@example.se",
+        "location": "Malmo, Sweden",
+        "timezone": "Europe/Stockholm",
+        "physiotherapist": "",
+        "program_id": ""
+    }
+];
+const k_appointments = [
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-20T08:00:00Z"),
+        "time": "08:00",
+        "note": "Initial consultation for knee injury."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-21T10:00:00Z"),
+        "time": "10:00",
+        "note": "Follow-up session for shoulder rehabilitation."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-22T12:00:00Z"),
+        "time": "12:00",
+        "note": "Evaluation for post-surgery recovery."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-23T09:30:00Z"),
+        "time": "09:30",
+        "note": "Session for improving mobility after accident."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-24T15:00:00Z"),
+        "time": "15:00",
+        "note": "Routine check-up and therapy plan adjustment."
+    }
+];
+const k_programs = [
+    {
+        "program_name": "Knee Rehabilitation",
+        "category": "Rehabilitation",
+        "description": "Exercises to improve knee mobility and strength.",
+        "repetitions": 3,
+        "exercises": ["Squats", "Lunges", "Leg Press"]
+    },
+    {
+        "program_name": "Shoulder Recovery",
+        "category": "Orthopedic",
+        "description": "Therapy for regaining shoulder movement.",
+        "repetitions": 2,
+        "exercises": ["Shoulder Rolls", "Pendulum Swings", "Arm Raises"]
+    },
+    {
+        "program_name": "Post-Surgery Therapy",
+        "category": "Rehabilitation",
+        "description": "Customized plan for surgery recovery.",
+        "repetitions": 4,
+        "exercises": ["Stretching", "Walking", "Balance Training"]
+    },
+    {
+        "program_name": "Mobility Restoration",
+        "category": "Neurological",
+        "description": "Sessions to enhance coordination and movement.",
+        "repetitions": 5,
+        "exercises": ["Step Training", "Balance Board", "Core Strength"]
+    },
+    {
+        "program_name": "General Therapy",
+        "category": "Pediatrics",
+        "description": "Basic exercises for improving body alignment.",
+        "repetitions": 3,
+        "exercises": ["Basic Yoga", "Jumping Jacks", "Skipping"]
+    }
+];
+/*
+=========================================================
+                        MUNICH
+=========================================================
+*/
+const m_physiotherapists = [
+    {
+        "name": "Hans Müller",
+        "email": "hans.mueller@physio.de",
+        "location": "Berlin, Germany",
+        "timezone": "Europe/Berlin",
+        "specialization": "Sports Therapy"
+    },
+    {
+        "name": "Clara Schneider",
+        "email": "clara.schneider@physio.de",
+        "location": "Munich, Germany",
+        "timezone": "Europe/Berlin",
+        "specialization": "Orthopedic Therapy"
+    },
+    {
+        "name": "Lukas Novak",
+        "email": "lukas.novak@physio.cz",
+        "location": "Prague, Czech Republic",
+        "timezone": "Europe/Prague",
+        "specialization": "Rehabilitation Therapy"
+    },
+    {
+        "name": "Marta Kowalska",
+        "email": "marta.kowalska@physio.pl",
+        "location": "Warsaw, Poland",
+        "timezone": "Europe/Warsaw",
+        "specialization": "Neurological Therapy"
+    },
+    {
+        "name": "Jakub Horváth",
+        "email": "jakub.horvath@physio.sk",
+        "location": "Bratislava, Slovakia",
+        "timezone": "Europe/Bratislava",
+        "specialization": "Pediatric Therapy"
+    }
+];
+const m_patients = [
+    {
+        "name": "Greta Schmidt",
+        "birth_date": "1988-05-10",
+        "email": "greta.schmidt@example.com",
+        "location": "Berlin, Germany",
+        "timezone": "Europe/Berlin",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Markus Braun",
+        "birth_date": "1975-12-15",
+        "email": "markus.braun@example.com",
+        "location": "Munich, Germany",
+        "timezone": "Europe/Berlin",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Ivana Hlaváčová",
+        "birth_date": "1990-03-25",
+        "email": "ivana.hlavacova@example.com",
+        "location": "Prague, Czech Republic",
+        "timezone": "Europe/Prague",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Piotr Zielinski",
+        "birth_date": "1982-08-19",
+        "email": "piotr.zielinski@example.com",
+        "location": "Warsaw, Poland",
+        "timezone": "Europe/Warsaw",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Katarina Kovac",
+        "birth_date": "1995-09-08",
+        "email": "katarina.kovac@example.com",
+        "location": "Bratislava, Slovakia",
+        "timezone": "Europe/Bratislava",
+        "physiotherapist": "",
+        "program_id": ""
+    }
+];
+const m_appointments = [
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-20T08:30:00Z"),
+        "time": "08:30",
+        "note": "Session to address post-run knee strain."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-21T14:00:00Z"),
+        "time": "14:00",
+        "note": "Check-up for lower back pain recovery."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-22T10:30:00Z"),
+        "time": "10:30",
+        "note": "Post-surgery progress review."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-23T13:00:00Z"),
+        "time": "13:00",
+        "note": "Mobility session after hip replacement."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-24T16:00:00Z"),
+        "time": "16:00",
+        "note": "Evaluation for chronic shoulder discomfort."
+    }
+];
+const m_programs = [
+    {
+        "program_name": "Marathon Recovery",
+        "category": "Sports",
+        "description": "Post-run recovery exercises.",
+        "repetitions": 3,
+        "exercises": ["Foam Rolling", "Leg Stretches", "Ankle Rotations"]
+    },
+    {
+        "program_name": "Lower Back Pain Relief",
+        "category": "Orthopedic",
+        "description": "Plan to reduce and prevent lower back pain.",
+        "repetitions": 4,
+        "exercises": ["Cat-Cow Stretch", "Bridge Pose", "Plank"]
+    },
+    {
+        "program_name": "Surgery Rehabilitation",
+        "category": "Rehabilitation",
+        "description": "Exercises to aid in recovery after surgery.",
+        "repetitions": 5,
+        "exercises": ["Walking", "Resistance Band Exercises", "Wall Push-ups"]
+    },
+    {
+        "program_name": "Hip Mobility Restoration",
+        "category": "Neurological",
+        "description": "Therapy to restore hip mobility.",
+        "repetitions": 3,
+        "exercises": ["Hip Flexor Stretch", "Side Leg Lifts", "Step Ups"]
+    },
+    {
+        "program_name": "Child Therapy Basics",
+        "category": "Pediatrics",
+        "description": "General exercises for children with movement issues.",
+        "repetitions": 2,
+        "exercises": ["Obstacle Course", "Jumping in Place", "Skipping Rope"]
+    }
+];
+/*
+=========================================================
+                        LONDON
+=========================================================
+*/
+const l_physiotherapist = [
+    {
+        "name": "Emily Taylor",
+        "email": "emily.taylor@physio.uk",
+        "location": "London, United Kingdom",
+        "timezone": "Europe/London",
+        "specialization": "Orthopedic Therapy"
+    },
+    {
+        "name": "James O'Connor",
+        "email": "james.oconnor@physio.ie",
+        "location": "Dublin, Ireland",
+        "timezone": "Europe/Dublin",
+        "specialization": "Rehabilitation Therapy"
+    },
+    {
+        "name": "Charlotte Wilson",
+        "email": "charlotte.wilson@physio.uk",
+        "location": "Manchester, United Kingdom",
+        "timezone": "Europe/London",
+        "specialization": "Sports Therapy"
+    },
+    {
+        "name": "Liam Edwards",
+        "email": "liam.edwards@physio.uk",
+        "location": "Birmingham, United Kingdom",
+        "timezone": "Europe/London",
+        "specialization": "Neurological Therapy"
+    },
+    {
+        "name": "Sophia Evans",
+        "email": "sophia.evans@physio.uk",
+        "location": "Edinburgh, Scotland",
+        "timezone": "Europe/London",
+        "specialization": "Pediatric Therapy"
+    }
+];
+const l_patients = [
+    {
+        "name": "Oliver Johnson",
+        "birth_date": "1990-01-12",
+        "email": "oliver.johnson@example.com",
+        "location": "London, United Kingdom",
+        "timezone": "Europe/London",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Aoife Murphy",
+        "birth_date": "1985-04-28",
+        "email": "aoife.murphy@example.com",
+        "location": "Dublin, Ireland",
+        "timezone": "Europe/Dublin",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Harry Clarke",
+        "birth_date": "1993-07-15",
+        "email": "harry.clarke@example.com",
+        "location": "Manchester, United Kingdom",
+        "timezone": "Europe/London",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Amelia Brown",
+        "birth_date": "1988-11-03",
+        "email": "amelia.brown@example.com",
+        "location": "Birmingham, United Kingdom",
+        "timezone": "Europe/London",
+        "physiotherapist": "",
+        "program_id": ""
+    },
+    {
+        "name": "Isla Campbell",
+        "birth_date": "1995-05-21",
+        "email": "isla.campbell@example.com",
+        "location": "Edinburgh, Scotland",
+        "timezone": "Europe/London",
+        "physiotherapist": "",
+        "program_id": ""
+    }
+];
+const l_appointments = [
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-20T09:00:00Z"),
+        "time": "09:00",
+        "note": "Session to manage shoulder pain."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-21T15:30:00Z"),
+        "time": "15:30",
+        "note": "Review post-accident recovery progress."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-22T11:00:00Z"),
+        "time": "11:00",
+        "note": "Knee rehabilitation session."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-23T14:00:00Z"),
+        "time": "14:00",
+        "note": "Therapy for recurring migraines."
+    },
+    {
+        "patient_id": "",
+        "physio_id": "",
+        "date": new Date("2024-11-24T10:30:00Z"),
+        "time": "10:30",
+        "note": "Initial consultation for child mobility issues."
+    }
+];
+const l_programs = [
+    {
+        "program_name": "Shoulder Strengthening",
+        "category": "Orthopedic",
+        "description": "Exercises for improving shoulder stability.",
+        "repetitions": 4,
+        "exercises": ["Arm Circles", "Wall Slides", "Resistance Band Pulls"]
+    },
+    {
+        "program_name": "Post-Accident Recovery",
+        "category": "Rehabilitation",
+        "description": "Plan to regain full mobility after an accident.",
+        "repetitions": 5,
+        "exercises": ["Step-ups", "Walking", "Resistance Band Stretches"]
+    },
+    {
+        "program_name": "Knee Stabilization",
+        "category": "Sports",
+        "description": "Therapy to prevent knee injuries.",
+        "repetitions": 3,
+        "exercises": ["Squats", "Lunges", "Leg Raises"]
+    },
+    {
+        "program_name": "Migraine Relief Therapy",
+        "category": "Neurological",
+        "description": "Exercises to reduce migraine frequency.",
+        "repetitions": 2,
+        "exercises": ["Neck Stretches", "Breathing Exercises", "Head Tilts"]
+    },
+    {
+        "program_name": "Pediatric Mobility Basics",
+        "category": "Pediatrics",
+        "description": "Therapy plan for improving children's mobility.",
+        "repetitions": 3,
+        "exercises": ["Crawling", "Jumping Jacks", "Obstacle Course"]
+    }
+];
+// Occupy database
+function seedDatabase(uri, database, physio_data, program_data, patient_data, appointment_data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            // Check if the URI is defined and not empty
+            if (!uri || uri.trim() === '') {
+                console.error("MongoDB URI is not defined or is empty. Please check your environment variables.");
+                process.exit(1); // Exit the process with error code
+            }
+            else {
+                // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
+                yield mongoose_1.default.connect(uri, { dbName: database });
+                // @ts-ignore
+                yield mongoose_1.default.connection.db.admin().command({ ping: 1 });
+                console.log("Pinged your deployment. You successfully connected to MongoDB!");
+                // Clear existing collections
+                yield schema_1.physiotherapist_col.deleteMany({});
+                // Insert physiotherapists and programs
+                const insertedPhysiotherapists = yield schema_1.physiotherapist_col.insertMany(physio_data);
+                console.log('Inserted physiotherapists:', insertedPhysiotherapists);
+                const insertedPrograms = yield schema_1.program_col.insertMany(program_data);
+                console.log('Inserted programs:', insertedPrograms);
+                patient_data.forEach((patient, index) => {
+                    // @ts-ignore
+                    patient.physiotherapist = insertedPhysiotherapists[index % insertedPhysiotherapists.length]._id.toString();
+                    // @ts-ignore
+                    patient.program_id = insertedPrograms[index % insertedPrograms.length]._id.toString();
+                });
+                const insertedPatients = yield schema_1.patient_col.insertMany(patient_data);
+                console.log('Inserted patient:', insertedPatients);
+                // Assign patient and physiotherapist IDs to appointments
+                appointment_data.forEach((appointment, index) => {
+                    // @ts-ignore
+                    appointment.patient_id = insertedPatients[index % insertedPatients.length]._id.toString();
+                    // @ts-ignore
+                    appointment.physio_id = insertedPhysiotherapists[index % insertedPhysiotherapists.length]._id.toString();
+                });
+                const insertedAppointments = yield schema_1.appointment_col.insertMany(appointment_data);
+                console.log('Inserted appointments:', insertedAppointments);
+            }
+        }
+        catch (error) {
+            console.error('Error seeding database:', error);
+        }
+        finally {
+            // Ensure the connection is closed even if there's an error
+            yield mongoose_1.default.disconnect();
+            console.log('Database connection closed.');
+        }
+    });
+}
+// Run the seeding function
+// seedDatabase(k_uri, 'karjaani', k_physiotherapists, k_programs, k_patients, k_appointments);
+// seedDatabase(m_uri, 'munich', m_physiotherapists, m_programs, m_patients, m_appointments);
+// seedDatabase(l_uri, 'london', l_physiotherapist, l_programs, l_patients, l_appointments);

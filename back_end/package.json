@@ -1,0 +1,25 @@
+{
+  "name": "back_end",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc",
+    "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"nodemon server.js\"",
+    "start": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node server.js\""
+  },
+  "packageManager": "yarn@4.5.1",
+  "dependencies": {
+    "@types/mongoose": "^5.11.97",
+    "express": "^4.21.1",
+    "mongoose": "^8.8.1",
+    "nodemon": "^3.1.7",
+    "tsc-watch": "6.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.9.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
