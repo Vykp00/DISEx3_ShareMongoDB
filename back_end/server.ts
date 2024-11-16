@@ -22,9 +22,9 @@ async function connectToDB(database: string) {
             throw new Error(`Unknown database: ${database}`);
         }
         // @ts-ignore
-        const currentDBName : string = mongoose.connection.name
+        const currentDBName: string = mongoose.connection.name
         console.log(`Currently connected to MongoDB: ${currentDBName}`);
-        if (mongoose.connection.readyState === 1 &&  currentDBName == database) {
+        if (mongoose.connection.readyState === 1 && currentDBName == database) {
             // Already connected to the same database
             return;
         }
@@ -37,25 +37,6 @@ async function connectToDB(database: string) {
         console.error(`Error connecting to ${database} database:`, error);
     }
 }
-
-// async function connectToDB(database: string): Promise<void> {
-//     if (!dbURIs[database]) {
-//         throw new Error(`Unknown database: ${database}`);
-//     }
-//     try {
-//         if (mongoose.connection.readyState === 1) {
-//             // Already connected, // Disconnect from any existing connection
-//             await mongoose.disconnect();
-//             await mongoose.connect(dbURIs[database], {dbName: database});
-//             console.log(`Connected to ${database} database!`);
-//             return;
-//         } else {
-//             await mongoose.connect(dbURIs[database], {dbName: database});
-//         }
-//     } catch (error) {
-//         console.error(`Error connecting to ${database} database:`, error);
-//     }
-// }
 
 
 // Middleware to handle errors
@@ -88,6 +69,7 @@ app.get('/patients', async (req: Request, res: Response) => {
         }
 
         await connectToDB(database);
+        // Do not send back unique object id
         const projection = {
             '_id': 0,
             '__v': 0,
@@ -101,6 +83,36 @@ app.get('/patients', async (req: Request, res: Response) => {
     }
 });
 
+
+// @ts-ignore
+app.get('/physiotherapists', async (req: Request, res: Response) => {
+    const location = req.query.location as string;
+
+    if (!location) {
+        return res.status(400).send({error: 'Location query parameter is required.'});
+    }
+    try {
+        // Determine which database to use based on location
+        const database = location.toLowerCase();
+
+        if (!dbURIs[database]) {
+            return res.status(400).send({error: `Invalid location: ${location}`});
+        }
+
+        await connectToDB(database);
+        // Do not send back unique object id
+        const projection = {
+            '_id': 0,
+            '__v': 0,
+        }
+
+        const physiotherapists = await physiotherapist_col.find({}, projection).exec();
+
+        res.json(physiotherapists);
+    } catch (error) {
+        res.status(500).send({error: `Error fetching physiotherapists ${error}`});
+    }
+});
 // Run the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
